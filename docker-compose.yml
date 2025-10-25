@@ -1,0 +1,43 @@
+services:
+  backend:
+    build:
+      context: ./BackEnd
+    container_name: backend
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+# Local credentials removed; configure these outside Git.
+    # Opcjonalnie zamontuj kod dla hot-reload (dotnet watch)
+    # volumes:
+    #   - ./BackEnd:/src
+
+  frontend:
+    build:
+      context: ./FrontEnd
+      dockerfile: Dockerfile
+    container_name: frontend
+    ports:
+      - "5173:5173"
+    environment:
+      NODE_ENV: development
+      VITE_API_BASE_URL: /api
+    volumes:
+      - ./FrontEnd:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+
+  db:
+    image: postgres:15
+    container_name: postgres
+    environment:
+      POSTGRES_USER: myuser
+# Local credentials removed; configure these outside Git.
+      POSTGRES_DB: mydatabase
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./db:/docker-entrypoint-initdb.d
