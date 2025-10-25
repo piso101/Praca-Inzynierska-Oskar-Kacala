@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -14,3 +14,5 @@ namespace BackEndPortfolioSite.Controllers
         public IActionResult Health() => Ok("API is running!");
     }
 }
+
+

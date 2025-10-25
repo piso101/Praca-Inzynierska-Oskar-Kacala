@@ -1,6 +1,7 @@
-
+using BackEnd.Infrastructure.Persistence;
+using BackEnd.Infrastructure.Persistence.Repositories;
+using BackEnd.Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Cors;
 
 namespace BackEndPortfolioSite
 {
@@ -12,6 +13,10 @@ namespace BackEndPortfolioSite
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
+            // DbContext (PostgreSQL)
+            builder.Services.AddDbContext<ApplicationDbContext>(options =>
+                options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
             // CORS dla frontendu (Vite: 5173)
             const string CorsPolicyName = "AllowDev";
@@ -30,6 +35,11 @@ namespace BackEndPortfolioSite
                 });
             });
 
+            // Rejestracja repozytoriów
+            builder.Services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
+            builder.Services.AddScoped<ISurveyRepository, SurveyRepository>();
+            builder.Services.AddScoped<ISurveyResponseRepository, SurveyResponseRepository>();
+
             var app = builder.Build();
             app.UseDeveloperExceptionPage();
             app.UseSwagger();
@@ -42,3 +52,5 @@ namespace BackEndPortfolioSite
         }
     }
 }
+
+
