@@ -13,9 +13,15 @@ namespace BackEnd.Infrastructure.Persistence.EntityConfigurations
             builder.HasKey(x => x.Id);
 
             builder.Property(x => x.Id).HasColumnName("id");
-            builder.Property(x => x.Role).HasColumnName("role").HasConversion<string>();
+
+            builder.Property(x => x.Role)
+                .HasColumnName("role");
+
+            
+
             builder.Property(x => x.DisplayName).HasColumnName("display_name");
             builder.Property(x => x.Email).HasColumnName("email");
+            builder.Property(x => x.PasswordHash).HasColumnName("password_hash");
             builder.Property(x => x.IsActive).HasColumnName("is_active");
             builder.Property(x => x.CreatedAt).HasColumnName("created_at");
 

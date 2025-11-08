@@ -1,22 +1,16 @@
 BEGIN;
 
--- Typy i role użytkowników
-DO $$
-BEGIN
-    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'user_role') THEN
-        CREATE TYPE user_role AS ENUM ('anonymous', 'admin');
-    END IF;
-END$$;
-
--- Tabela użytkowników (administratorzy oraz anonimowi uczestnicy)
+-- Tabela użytkowników z role jako integer
 CREATE TABLE IF NOT EXISTS user_account (
     id BIGSERIAL PRIMARY KEY,
-    role user_role NOT NULL DEFAULT 'anonymous',
+    role INTEGER NOT NULL DEFAULT 0,  -- <-- integer zamiast user_role
     display_name TEXT,
     email TEXT UNIQUE,
+    password_hash TEXT NOT NULL DEFAULT '',
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
 
 -- Tabela ankiet
 CREATE TABLE IF NOT EXISTS survey (
@@ -29,7 +23,7 @@ CREATE TABLE IF NOT EXISTS survey (
     published_at TIMESTAMPTZ
 );
 
--- Tabela pytań w ankiecie
+-- Tabela pytań
 CREATE TABLE IF NOT EXISTS survey_question (
     id BIGSERIAL PRIMARY KEY,
     survey_id BIGINT NOT NULL REFERENCES survey(id) ON DELETE CASCADE,
@@ -39,7 +33,7 @@ CREATE TABLE IF NOT EXISTS survey_question (
     CONSTRAINT uq_survey_question_order UNIQUE (survey_id, order_index)
 );
 
--- Elementy (modele) przypięte do pytania: ID, x, y, rotacja, skala, nazwa pliku SVG
+-- Elementy pytań
 CREATE TABLE IF NOT EXISTS question_element (
     id BIGSERIAL PRIMARY KEY,
     question_id BIGINT NOT NULL REFERENCES survey_question(id) ON DELETE CASCADE,
@@ -50,11 +44,10 @@ CREATE TABLE IF NOT EXISTS question_element (
     svg_name TEXT NOT NULL,
     order_index INTEGER NOT NULL DEFAULT 0,
     CONSTRAINT uq_question_element_order UNIQUE (question_id, order_index),
-    -- Unikalność pary (id, question_id) do wsparcia złożonego klucza obcego
     CONSTRAINT uq_question_element_id_question UNIQUE (id, question_id)
 );
 
--- Odpowiedź użytkownika na ankietę (anonimowa lub powiązana z użytkownikiem)
+-- Odpowiedzi użytkowników
 CREATE TABLE IF NOT EXISTS survey_response (
     id BIGSERIAL PRIMARY KEY,
     survey_id BIGINT NOT NULL REFERENCES survey(id) ON DELETE CASCADE,
@@ -63,21 +56,20 @@ CREATE TABLE IF NOT EXISTS survey_response (
     metadata JSONB
 );
 
--- Wybory w ramach odpowiedzi: dla każdego pytania wskazany element
+-- Wybrane elementy w odpowiedzi
 CREATE TABLE IF NOT EXISTS response_answer (
     id BIGSERIAL PRIMARY KEY,
     response_id BIGINT NOT NULL REFERENCES survey_response(id) ON DELETE CASCADE,
     question_id BIGINT NOT NULL REFERENCES survey_question(id) ON DELETE CASCADE,
     selected_element_id BIGINT NOT NULL REFERENCES question_element(id) ON DELETE RESTRICT,
     CONSTRAINT uq_response_question UNIQUE (response_id, question_id),
-    -- Wymuś, aby wybrany element należał do tego samego pytania
     CONSTRAINT fk_answer_element_belongs_to_question
         FOREIGN KEY (selected_element_id, question_id)
         REFERENCES question_element (id, question_id)
         ON DELETE RESTRICT
 );
 
--- Indeksy pomocnicze
+-- Indeksy
 CREATE INDEX IF NOT EXISTS idx_survey_question_survey ON survey_question (survey_id);
 CREATE INDEX IF NOT EXISTS idx_question_element_question ON question_element (question_id);
 CREATE INDEX IF NOT EXISTS idx_survey_response_survey ON survey_response (survey_id);
@@ -87,5 +79,3 @@ CREATE INDEX IF NOT EXISTS idx_response_answer_question ON response_answer (ques
 CREATE INDEX IF NOT EXISTS idx_response_answer_selected_element ON response_answer (selected_element_id);
 
 COMMIT;
-
-

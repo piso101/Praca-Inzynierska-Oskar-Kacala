@@ -10,6 +10,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
 # Local credentials removed; configure these outside Git.
+# Local credentials removed; configure these outside Git.
     # Opcjonalnie zamontuj kod dla hot-reload (dotnet watch)
     # volumes:
     #   - ./BackEnd:/src
