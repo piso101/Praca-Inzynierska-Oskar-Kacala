@@ -1,6 +1,4 @@
 using BackEnd.Application.Contracts.Auth;
-using BackEnd.Domain.Repositories;
-using BackEnd.Domain.Shared;
 using BackEnd.Extensions;
 using BackEnd.Infrastructure.Services.Auth;
 

@@ -1,4 +1,5 @@
 using BackEnd.Domain.Shared;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BackEnd.Domain.Entities
 {
@@ -12,7 +13,7 @@ namespace BackEnd.Domain.Entities
         public bool IsActive { get; set; } = true;
         public DateTime CreatedAt { get; set; }
 
-        public ICollection<Survey> CreatedSurveys { get; set; } = new List<Survey>();
-        public ICollection<SurveyResponse> Responses { get; set; } = new List<SurveyResponse>();
+        [NotMapped]
+        public ICollection<int> CreatedSurveysIds { get; set; } = new List<int>();
     }
 }

@@ -23,6 +23,11 @@ namespace BackEnd.Infrastructure.Persistence.EntityConfigurations
                 .WithOne(x => x.Survey)
                 .HasForeignKey(x => x.SurveyId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasOne(x => x.Creator)
+               .WithMany()   
+               .HasForeignKey(x => x.CreatedBy)
+               .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }

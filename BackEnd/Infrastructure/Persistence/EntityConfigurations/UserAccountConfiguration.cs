@@ -21,11 +21,6 @@ namespace BackEnd.Infrastructure.Persistence.EntityConfigurations
             builder.Property(x => x.PasswordHash).HasColumnName("password_hash");
             builder.Property(x => x.IsActive).HasColumnName("is_active");
             builder.Property(x => x.CreatedAt).HasColumnName("created_at");
-
-            builder.HasMany(x => x.CreatedSurveys)
-                .WithOne(x => x.Creator)
-                .HasForeignKey(x => x.CreatedBy)
-                .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }

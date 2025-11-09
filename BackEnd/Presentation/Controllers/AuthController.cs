@@ -45,6 +45,8 @@ namespace BackEndPortfolioSite.Controllers
         public async Task<IActionResult> CreateAdmin([FromBody] CreateAdminRequestDto request, [FromServices] IUserRepository users, [FromServices] IRepository<BackEnd.Domain.Entities.UserAccount> repo, [FromServices] IConfiguration config)
         {
             var ownerPassword = config["OwnerPassword"];
+
+            #region Validations
             if (string.IsNullOrWhiteSpace(ownerPassword) || request.OwnerPassword != ownerPassword)
             {
                 return Unauthorized("Invalid owner password");
@@ -60,6 +62,7 @@ namespace BackEndPortfolioSite.Controllers
             {
                 return Conflict("User already exists");
             }
+            #endregion
 
             var user = new BackEnd.Domain.Entities.UserAccount
             {

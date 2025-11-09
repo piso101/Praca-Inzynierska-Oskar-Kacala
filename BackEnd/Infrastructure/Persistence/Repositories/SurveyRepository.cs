@@ -20,5 +20,14 @@ namespace BackEnd.Infrastructure.Persistence.Repositories
                 .ThenInclude(q => q.Elements)
                 .FirstOrDefaultAsync(s => s.Id == id, cancellationToken);
         }
+        public async Task<Survey?> GetByIdAsync(long id, Func<IQueryable<Survey>, IQueryable<Survey>>? include = null, CancellationToken cancellationToken = default)
+        {
+            IQueryable<Survey> query = (IQueryable<Survey>)_dbContext;
+
+            if (include != null)
+                query = include(query);
+
+            return await query.FirstOrDefaultAsync(e => EF.Property<long>(e, "Id") == id, cancellationToken);
+        }
     }
 }
