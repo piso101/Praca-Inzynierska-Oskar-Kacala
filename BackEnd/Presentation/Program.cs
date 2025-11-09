@@ -12,7 +12,7 @@ namespace BackEndPortfolioSite
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Usługi
+            #region Services Registration
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerWithJwt();
@@ -22,10 +22,11 @@ namespace BackEndPortfolioSite
             builder.Services.AddCustomCors();
             builder.Services.AddAutoMapper(typeof(AuthMappingProfile).Assembly);
             builder.Services.AddScoped<JwtTokenService>();
+            #endregion 
 
             var app = builder.Build();
 
-            // Middleware
+            #region Middleware Configuration
             app.UseDeveloperExceptionPage();
             app.UseSwagger();
             app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "app v1"));
@@ -33,6 +34,7 @@ namespace BackEndPortfolioSite
             app.UseAuthentication();
             app.UseAuthorization();
             app.MapControllers();
+            #endregion
 
             app.Run();
         }
