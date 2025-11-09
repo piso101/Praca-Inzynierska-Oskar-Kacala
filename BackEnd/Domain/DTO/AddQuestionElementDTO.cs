@@ -1,0 +1,15 @@
+﻿using BackEnd.Domain.Entities;
+
+namespace BackEnd.Domain.DTO
+{
+    public class AddQuestionElementDTO
+    {
+        public long QuestionId { get; set; }
+        public decimal X { get; set; }
+        public decimal Y { get; set; }
+        public decimal Rotation { get; set; }
+        public decimal Scale { get; set; }
+        public string SvgName { get; set; } = string.Empty;
+        public int OrderIndex { get; set; }
+    }
+}

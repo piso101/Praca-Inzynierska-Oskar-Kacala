@@ -13,6 +13,7 @@ namespace BackEndPortfolioSite.Controllers
     [Route("api/[controller]")]
     public class SurveyController : ControllerBase
     {
+        #region Create Survey Endpoint
         [HttpPost("create-survey")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateSurvey([FromBody] CreateSurveyDTO request, [FromServices] IRepository<BackEnd.Domain.Entities.Survey> surveyRepo, [FromServices] IRepository<BackEnd.Domain.Entities.UserAccount> userRepo)
@@ -49,7 +50,9 @@ namespace BackEndPortfolioSite.Controllers
 
             return Ok(new { Success = true, SurveyId = survey.Id });
         }
+        #endregion
 
+        #region Read Survey Endpoint
         [HttpGet("read-survey")]
         [AllowAnonymous]
         public async Task<IActionResult> GetSurvey([FromQuery] long surveyId, [FromServices] IRepository<BackEnd.Domain.Entities.Survey> surveyRepo, [FromServices] IRepository<BackEnd.Domain.Entities.UserAccount> userRepo)
@@ -75,7 +78,9 @@ namespace BackEndPortfolioSite.Controllers
 
             return Ok(new GetSurveyDTO(survey));
         }
+        #endregion
 
+        #region Update Survey Endpoint
         [HttpPost("update-survey")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateSurvey([FromBody] UpdateSurveyDTO request, [FromServices] IRepository<BackEnd.Domain.Entities.Survey> surveyRepo, [FromServices] IRepository<BackEnd.Domain.Entities.UserAccount> userRepo)
@@ -101,7 +106,7 @@ namespace BackEndPortfolioSite.Controllers
             {
                 return NotFound("Survey not found");
             }
-            if (userId != survey.CreatedBy) 
+            if (userId != survey.CreatedBy)
             {
                 return Forbid("You are not the creator of this survey");
             }
@@ -120,7 +125,9 @@ namespace BackEndPortfolioSite.Controllers
 
             return Ok(new { Success = true });
         }
+        #endregion
 
+        #region Delete Survey Endpoint
         [HttpDelete("delete-survey")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteSurvey([FromQuery] long surveyId, [FromServices] IRepository<BackEnd.Domain.Entities.Survey> surveyRepo)
@@ -152,5 +159,37 @@ namespace BackEndPortfolioSite.Controllers
             await surveyRepo.SaveChangesAsync();
             return Ok(new { Success = true });
         }
+        #endregion
+
+        #region Get List of Surveys Endpoint
+        [HttpGet("get-list-of-surveys")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetListOfSurveys([FromServices] IRepository<BackEnd.Domain.Entities.Survey> surveyRepo, [FromServices] IRepository<BackEnd.Domain.Entities.UserAccount> userRepo)
+        {
+            #region Load Surveys
+            var surveys = await surveyRepo.ListAsync(s => s.IsActive);
+            foreach (var survey in surveys)
+            {
+                if (survey.CreatedBy.HasValue)
+                {
+                    survey.Creator = await userRepo.GetByIdAsync(survey.CreatedBy.Value);
+                }
+            }
+            var surveyDTOs = surveys
+                .Where(s=>s.IsActive)
+                .Select(s => new GetSurveyListElement(s))
+                .ToList();
+            #endregion
+
+            #region Validation
+            if (!surveyDTOs.Any())
+            {
+                return NotFound("Survey's not found");
+            }
+            #endregion
+
+            return Ok(surveyDTOs);
+        }
+        #endregion
     }
 }

@@ -4,6 +4,7 @@ using BackEnd.Domain.Shared;
 using BackEnd.Infrastructure.Services.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace BackEndPortfolioSite.Controllers
 {
@@ -11,10 +12,13 @@ namespace BackEndPortfolioSite.Controllers
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
+        #region Health Check Endpoint
         [HttpGet("health")]
         [Authorize(Roles = "Admin")]
         public IActionResult Health() => Ok("API is running!");
+        #endregion
 
+        #region Login Endpoint
         [HttpPost("login")]
         [AllowAnonymous]
         public async Task<ActionResult<LoginResponseDto>> Login([FromBody] LoginRequestDto request, [FromServices] IUserRepository users, [FromServices] JwtTokenService tokens)
@@ -39,7 +43,9 @@ namespace BackEndPortfolioSite.Controllers
             var token = tokens.GenerateToken(user);
             return Ok(new LoginResponseDto { Success = true, Token = token });
         }
+        #endregion
 
+        #region Create Admin Endpoint
         [HttpPost("create-admin")]
         [AllowAnonymous]
         public async Task<IActionResult> CreateAdmin([FromBody] CreateAdminRequestDto request, [FromServices] IUserRepository users, [FromServices] IRepository<BackEnd.Domain.Entities.UserAccount> repo, [FromServices] IConfiguration config)
@@ -78,5 +84,33 @@ namespace BackEndPortfolioSite.Controllers
             await repo.SaveChangesAsync();
             return Ok();
         }
+        #endregion
+
+        #region Get Current User Endpoint
+        [HttpGet("me")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetCurrentUser([FromServices] IUserRepository users)
+        {
+            #region UserId from Token
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userIdClaim) || !long.TryParse(userIdClaim, out var userId))
+            {
+                return Unauthorized("Nie można pobrać ID użytkownika z tokenu");
+            }
+            #endregion
+
+            var user = await users.GetByIdAsync(userId);
+            if (user == null)
+            {
+                return NotFound("User not found");
+            }
+
+            return Ok(new
+            {
+                user.Email,
+                user.DisplayName
+            });
+        }
+        #endregion
     }
 }
