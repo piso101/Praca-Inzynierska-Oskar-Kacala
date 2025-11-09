@@ -1,7 +1,6 @@
-using Microsoft.EntityFrameworkCore;
 using BackEnd.Domain.Entities;
 using BackEnd.Infrastructure.Persistence.EntityConfigurations;
-using BackEnd.Domain.Shared;
+using Microsoft.EntityFrameworkCore;
 
 namespace BackEnd.Infrastructure.Persistence
 {
@@ -30,5 +29,3 @@ namespace BackEnd.Infrastructure.Persistence
         }
     }
 }
-
-

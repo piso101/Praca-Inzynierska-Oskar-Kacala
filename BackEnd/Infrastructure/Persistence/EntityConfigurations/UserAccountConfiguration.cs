@@ -1,5 +1,4 @@
 using BackEnd.Domain.Entities;
-using BackEnd.Domain.Shared;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -17,8 +16,6 @@ namespace BackEnd.Infrastructure.Persistence.EntityConfigurations
             builder.Property(x => x.Role)
                 .HasColumnName("role");
 
-            
-
             builder.Property(x => x.DisplayName).HasColumnName("display_name");
             builder.Property(x => x.Email).HasColumnName("email");
             builder.Property(x => x.PasswordHash).HasColumnName("password_hash");
@@ -32,5 +29,3 @@ namespace BackEnd.Infrastructure.Persistence.EntityConfigurations
         }
     }
 }
-
-

@@ -1,16 +1,17 @@
+using BackEnd.Application.Contracts.Auth;
+using BackEnd.Domain.Repositories;
+using BackEnd.Domain.Shared;
 using BackEnd.Infrastructure.Persistence;
 using BackEnd.Infrastructure.Persistence.Repositories;
-using BackEnd.Domain.Repositories;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using AutoMapper;
-using BackEnd.Application.Contracts.Auth;
 using BackEnd.Infrastructure.Services.Auth;
-using BackEnd.Domain.Shared;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Npgsql;
 using Npgsql.NameTranslation;
+using System.Security.Claims;
+using System.Text;
 
 namespace BackEndPortfolioSite
 {
@@ -21,13 +22,51 @@ namespace BackEndPortfolioSite
             var builder = WebApplication.CreateBuilder(args);
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+
+            // Swagger
+            //builder.Services.AddSwaggerGen();
+            builder.Services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "BackEnd API",
+                    Version = "v1",
+                    Description = "API z JWT autoryzacją"
+                });
+
+                // 🔐 Dodaj definicję schematu JWT Bearer
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "Bearer",
+                    BearerFormat = "JWT",
+                    In = ParameterLocation.Header,
+                    Description = "Podaj token JWT w formacie: Bearer {token}"
+                });
+
+                // 🔒 Wymuś użycie schematu na zabezpieczonych endpointach
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                    {
+                        {
+                            new OpenApiSecurityScheme
+                            {
+                                Reference = new OpenApiReference
+                                {
+                                    Type = ReferenceType.SecurityScheme,
+                                    Id = "Bearer"
+                                }
+                            },
+                            Array.Empty<string>()
+                        }
+                    });
+            });
 
             // DbContext (PostgreSQL) z mapowaniem enum 'user_role' na poziomie DataSource
             var connString = builder.Configuration.GetConnectionString("DefaultConnection");
             var dataSourceBuilder = new NpgsqlDataSourceBuilder(connString);
-			var enumTranslator = new NpgsqlSnakeCaseNameTranslator();
-			dataSourceBuilder.MapEnum<UserRole>("user_role", enumTranslator);
+            var enumTranslator = new NpgsqlSnakeCaseNameTranslator();
+            dataSourceBuilder.MapEnum<UserRole>("user_role", enumTranslator);
             var dataSource = dataSourceBuilder.Build();
             builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(dataSource));
 
@@ -57,34 +96,41 @@ namespace BackEndPortfolioSite
             builder.Services.AddScoped<ISurveyResponseRepository, SurveyResponseRepository>();
             builder.Services.AddScoped<IUserRepository, UserRepository>();
 
-            // JWT Auth
-            var jwtKey = builder.Configuration["Jwt:Key"] ?? "dev-secret-change";
+            // === JWT Authentication ===
+            var jwtKey = builder.Configuration["Jwt:Key"] ?? "REDACTED_CREDENTIAL!!!";
             var jwtIssuer = builder.Configuration["Jwt:Issuer"] ?? "app";
             var jwtAudience = builder.Configuration["Jwt:Audience"] ?? "app";
+
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
 
-            builder.Services.AddAuthentication(o =>
+            builder.Services
+                .AddAuthentication(options =>
+                {
+                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
+            .AddJwtBearer(options =>
             {
-                o.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                o.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
-            .AddJwtBearer(o =>
-            {
-                o.RequireHttpsMetadata = false;
-                o.SaveToken = true;
-                o.TokenValidationParameters = new TokenValidationParameters
+                options.RequireHttpsMetadata = false;
+                options.SaveToken = true;
+                options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = key,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
                     ValidateIssuer = true,
                     ValidIssuer = jwtIssuer,
                     ValidateAudience = true,
                     ValidAudience = jwtAudience,
-                    ValidateLifetime = true
+                    ValidateLifetime = true,
+                    ClockSkew = TimeSpan.Zero,
+                    RoleClaimType = ClaimTypes.Role // <- musi zgadzać się z typem claim w tokenie
                 };
             });
 
-            builder.Services.AddSingleton<JwtTokenService>();
+            builder.Services.AddAuthorization();
+
+            // === Services ===
+            builder.Services.AddScoped<JwtTokenService>();
 
             var app = builder.Build();
             app.UseDeveloperExceptionPage();
@@ -99,5 +145,3 @@ namespace BackEndPortfolioSite
         }
     }
 }
-
-

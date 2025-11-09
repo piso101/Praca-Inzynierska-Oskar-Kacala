@@ -16,5 +16,3 @@ namespace BackEnd.Domain.Entities
         public ICollection<SurveyResponse> Responses { get; set; } = new List<SurveyResponse>();
     }
 }
-
-

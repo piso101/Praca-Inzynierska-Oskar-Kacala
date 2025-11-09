@@ -1,9 +1,7 @@
 using BackEnd.Domain.Entities;
-using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Security.Cryptography;
 using System.Text;
 
 namespace BackEnd.Infrastructure.Services.Auth
@@ -19,9 +17,7 @@ namespace BackEnd.Infrastructure.Services.Auth
 
         public string GenerateToken(UserAccount user)
         {
-            byte[] keyBytes = new byte[32]; // 256-bit
-            RandomNumberGenerator.Fill(keyBytes);
-            string jwtKey = Convert.ToBase64String(keyBytes);
+            var jwtKey = _config["Jwt:Key"];
             var jwtIssuer = _config["Jwt:Issuer"] ?? "app";
             var jwtAudience = _config["Jwt:Audience"] ?? "app";
 
@@ -46,8 +42,37 @@ namespace BackEnd.Infrastructure.Services.Auth
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
+        public ClaimsPrincipal? ValidateToken(string token)
+        {
+            var jwtKey = _config["Jwt:Key"];
+            var jwtIssuer = _config["Jwt:Issuer"] ?? "app";
+            var jwtAudience = _config["Jwt:Audience"] ?? "app";
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
+
+            var validationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = jwtIssuer,
+                ValidAudience = jwtAudience,
+                IssuerSigningKey = key,
+                ValidateLifetime = true, // sprawdza czy token nie wygas³
+                ClockSkew = TimeSpan.Zero // brak "okna tolerancji" czasu
+            };
+
+            try
+            {
+                var principal = tokenHandler.ValidateToken(token, validationParameters, out _);
+                return principal;
+            }
+            catch (Exception)
+            {
+                return null; // token niepoprawny lub wygas³
+            }
+        }
     }
 }
-
-
-

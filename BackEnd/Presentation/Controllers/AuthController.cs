@@ -1,19 +1,18 @@
 using BackEnd.Application.Contracts.Auth;
 using BackEnd.Domain.Repositories;
-using BackEnd.Infrastructure.Services.Auth;
 using BackEnd.Domain.Shared;
+using BackEnd.Infrastructure.Services.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace BackEndPortfolioSite.Controllers
 {
-
     [ApiController]
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
         [HttpGet("health")]
+        [Authorize(Roles = "Admin")]
         public IActionResult Health() => Ok("API is running!");
 
         [HttpPost("login")]
@@ -78,5 +77,3 @@ namespace BackEndPortfolioSite.Controllers
         }
     }
 }
-
-
