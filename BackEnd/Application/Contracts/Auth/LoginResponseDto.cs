@@ -7,6 +7,3 @@ namespace BackEnd.Application.Contracts.Auth
         public string? Message { get; set; }
     }
 }
-
-
-

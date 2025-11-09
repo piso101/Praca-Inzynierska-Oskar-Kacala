@@ -7,6 +7,3 @@ namespace BackEnd.Domain.Repositories
         Task<UserAccount?> GetByEmailAsync(string email, CancellationToken cancellationToken = default);
     }
 }
-
-
-

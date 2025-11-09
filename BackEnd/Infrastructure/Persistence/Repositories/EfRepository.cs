@@ -1,6 +1,6 @@
-using System.Linq.Expressions;
 using BackEnd.Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace BackEnd.Infrastructure.Persistence.Repositories
 {
@@ -54,5 +54,3 @@ namespace BackEnd.Infrastructure.Persistence.Repositories
         }
     }
 }
-
-

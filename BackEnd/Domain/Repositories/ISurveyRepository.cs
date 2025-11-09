@@ -7,5 +7,3 @@ namespace BackEnd.Domain.Repositories
         Task<Survey?> GetWithQuestionsAsync(long id, CancellationToken cancellationToken = default);
     }
 }
-
-

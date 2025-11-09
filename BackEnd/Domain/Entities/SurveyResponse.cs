@@ -13,5 +13,3 @@ namespace BackEnd.Domain.Entities
         public ICollection<ResponseAnswer> Answers { get; set; } = new List<ResponseAnswer>();
     }
 }
-
-

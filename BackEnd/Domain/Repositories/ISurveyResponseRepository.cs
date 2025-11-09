@@ -7,5 +7,3 @@ namespace BackEnd.Domain.Repositories
         Task<IReadOnlyList<SurveyResponse>> ListBySurveyAsync(long surveyId, CancellationToken cancellationToken = default);
     }
 }
-
-

@@ -14,5 +14,3 @@ namespace BackEnd.Domain.Entities
         public SurveyQuestion Question { get; set; } = null!;
     }
 }
-
-

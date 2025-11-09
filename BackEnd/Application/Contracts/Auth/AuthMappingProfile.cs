@@ -13,6 +13,3 @@ namespace BackEnd.Application.Contracts.Auth
         }
     }
 }
-
-
-

@@ -24,5 +24,3 @@ namespace BackEnd.Infrastructure.Persistence.EntityConfigurations
         }
     }
 }
-
-

@@ -12,5 +12,3 @@ namespace BackEnd.Domain.Entities
         public QuestionElement SelectedElement { get; set; } = null!;
     }
 }
-
-

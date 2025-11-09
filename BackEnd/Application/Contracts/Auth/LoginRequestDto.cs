@@ -6,6 +6,3 @@ namespace BackEnd.Application.Contracts.Auth
         public string Password { get; set; } = string.Empty;
     }
 }
-
-
-

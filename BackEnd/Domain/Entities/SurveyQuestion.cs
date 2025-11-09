@@ -12,5 +12,3 @@ namespace BackEnd.Domain.Entities
         public ICollection<QuestionElement> Elements { get; set; } = new List<QuestionElement>();
     }
 }
-
-
