@@ -2,6 +2,7 @@ using BackEnd.Domain.Repositories;
 using BackEnd.Domain.Shared;
 using BackEnd.Infrastructure.Persistence;
 using BackEnd.Infrastructure.Persistence.Repositories;
+using BackEnd.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -24,13 +25,26 @@ namespace BackEnd.Extensions
             services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(dataSource));
             return services;
         }
-
         public static IServiceCollection AddCustomRepositories(this IServiceCollection services)
         {
             services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IQuestAccountRepository, QuestAccountRepository>();
             services.AddScoped<ISurveyRepository, SurveyRepository>();
             services.AddScoped<ISurveyResponseRepository, SurveyResponseRepository>();
+            return services;
+        }
+
+        public static IServiceCollection AddInviteCodeHasher(this IServiceCollection services)
+        {
+            services.AddSingleton<IHashKeyProvider, HashKeyProvider>();
+            services.AddSingleton<IInviteCodeService, InviteCodeService>();
+            return services;
+        }
+
+        public static IServiceCollection AddEmailService(this IServiceCollection services)
+        {
+            services.AddScoped<IEmailSenderService, EmailSenderService>();
             return services;
         }
 
@@ -93,15 +107,15 @@ namespace BackEnd.Extensions
                     Description = "Podaj token JWT w formacie: Bearer {token}"
                 });
                 c.AddSecurityRequirement(new OpenApiSecurityRequirement
-            {
                 {
-                    new OpenApiSecurityScheme
                     {
-                        Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
-                    },
-                    Array.Empty<string>()
-                }
-            });
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
+                        },
+                        Array.Empty<string>()
+                    }
+                });
             });
             return services;
         }

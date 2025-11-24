@@ -1,0 +1,132 @@
+.root {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.left {
+  background: #000;
+  padding: calc(var(--nav-height)) 48px 48px;
+  display: grid;
+  align-content: start;
+  gap: 32px;
+}
+
+.brand {
+  font-weight: 200;
+  font-size: clamp(48px, 10vw, 112px);
+  letter-spacing: 2px;
+  margin-top: 20px;
+}
+
+.form {
+  max-width: 720px;
+  display: grid;
+  gap: 18px;
+}
+
+.label {
+  font-size: 14px;
+  color: var(--text-dim);
+  margin-bottom: 6px;
+}
+
+.input {
+  width: 100%;
+  background: transparent;
+  color: var(--text-color);
+  border: 2px solid rgba(255,255,255,0.7);
+  outline: none;
+  padding: 16px 18px;
+  border-radius: 10px;
+  font-size: 16px;
+}
+.input:focus {
+  border-color: #fff;
+}
+
+.inputWrap {
+  position: relative;
+}
+
+.toggle {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: 0;
+  color: var(--text-dim);
+  padding: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.toggle:hover {
+  color: var(--text-color);
+  background: rgba(255,255,255,0.06);
+}
+
+.row {
+  display: grid;
+  gap: 8px;
+}
+
+.forgot {
+  margin-top: 4px;
+  color: var(--text-dim);
+  font-size: 14px;
+  width: max-content;
+}
+.forgot:hover {
+  color: var(--text-color);
+}
+
+.button {
+  margin-top: 8px;
+  width: 220px;
+  background: #000;
+  color: #fff;
+  border: 2px solid rgba(255,255,255,0.9);
+  padding: 16px 24px;
+  font-weight: 700;
+  font-size: 28px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform .05s ease, background .2s ease;
+}
+.button:hover {
+  background: rgba(255,255,255,0.06);
+}
+.button:active {
+  transform: translateY(1px);
+}
+
+.error {
+  color: #ffb3b3;
+  font-size: 14px;
+}
+
+.right {
+  position: relative;
+}
+.bg {
+  position: absolute;
+  inset: 0;
+  background-position: center bottom;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+@media (max-width: 1024px) {
+  .root {
+    grid-template-columns: 1fr;
+  }
+  .right {
+    display: none;
+  }
+}
+
+

@@ -11,6 +11,7 @@ namespace BackEnd.Infrastructure.Persistence
         }
 
         public DbSet<UserAccount> UserAccounts => Set<UserAccount>();
+        public DbSet<QuestAccount> QuestAccounts => Set<QuestAccount>();
         public DbSet<Survey> Surveys => Set<Survey>();
         public DbSet<SurveyQuestion> SurveyQuestions => Set<SurveyQuestion>();
         public DbSet<QuestionElement> QuestionElements => Set<QuestionElement>();
@@ -21,6 +22,7 @@ namespace BackEnd.Infrastructure.Persistence
         {
             base.OnModelCreating(modelBuilder);
             modelBuilder.ApplyConfiguration(new UserAccountConfiguration());
+            modelBuilder.ApplyConfiguration(new QuestAccountConfiguration());
             modelBuilder.ApplyConfiguration(new SurveyConfiguration());
             modelBuilder.ApplyConfiguration(new SurveyQuestionConfiguration());
             modelBuilder.ApplyConfiguration(new QuestionElementConfiguration());

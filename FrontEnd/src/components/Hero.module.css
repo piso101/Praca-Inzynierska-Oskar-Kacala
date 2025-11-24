@@ -1,0 +1,46 @@
+.root {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  overflow: hidden;
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  background-position: center bottom;
+  background-repeat: no-repeat;
+  background-size: cover;
+  filter: saturate(1.1);
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(1200px 600px at 50% 20%, rgba(255,255,255,0.08), rgba(0,0,0,0.35) 55%, rgba(0,0,0,0.7));
+}
+
+.content {
+  position: relative;
+  z-index: 1;
+  padding: 0 16px;
+}
+
+.title {
+    margin: 0;
+    font-weight: 200;
+    letter-spacing: 2px;
+    font-size: clamp(48px, 20vw, 1600px);
+    line-height: 0.95;
+    color: #000;
+    display: inline-block; 
+    transform: translateY(-150px);
+  }
+.subtitle {
+  margin: 16px 0 0;
+  font-size: clamp(14px, 2.8vw, 20px);
+  color: #000;
+}

@@ -7,6 +7,7 @@ namespace BackEnd.Domain.DTO
         #region Constructor
         public GetSurveyListElement(Survey survey)
         {
+            this.Id = survey.Id;
             this.Description = survey.Description;
             this.Title = survey.Title;
             this.CreatedAt = survey.CreatedAt;
@@ -16,6 +17,7 @@ namespace BackEnd.Domain.DTO
         #endregion
 
         #region Properties
+        public long Id { get; set; }
         public string Title { get; set; } = string.Empty;
         public string? Description { get; set; }
         public DateTime CreatedAt { get; set; }

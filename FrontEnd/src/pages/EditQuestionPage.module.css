@@ -1,0 +1,52 @@
+.root {
+  min-height: 100vh;
+  padding-top: calc(var(--nav-height) + 40px);
+}
+
+.container {
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding: 0 24px 48px;
+}
+
+.title {
+  font-size: clamp(20px, 3.5vw, 44px);
+  font-weight: 300;
+  letter-spacing: 0.6px;
+  margin: 0 0 28px 0;
+}
+
+.field { display: grid; gap: 10px; margin-bottom: 16px; }
+.label { font-size: 16px; color: var(--text-dim); }
+.input {
+  background: transparent;
+  color: var(--text-color);
+  border: 2px solid rgba(255,255,255,0.7);
+  border-radius: 10px;
+  padding: 14px 16px;
+  font-size: 16px;
+  outline: none;
+}
+.input:focus { border-color: #fff; }
+
+.actions {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  margin-top: 24px;
+}
+.btn {
+  background: #000;
+  color: #fff;
+  border: 2px solid rgba(255,255,255,0.9);
+  padding: 12px 18px;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+
+
+
+
+

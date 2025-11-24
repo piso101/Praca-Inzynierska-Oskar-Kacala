@@ -88,16 +88,14 @@ namespace BackEndPortfolioSite.Controllers
 
         #region Get Current User Endpoint
         [HttpGet("me")]
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         public async Task<IActionResult> GetCurrentUser([FromServices] IUserRepository users)
         {
-            #region UserId from Token
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(userIdClaim) || !long.TryParse(userIdClaim, out var userId))
             {
                 return Unauthorized("Nie można pobrać ID użytkownika z tokenu");
             }
-            #endregion
 
             var user = await users.GetByIdAsync(userId);
             if (user == null)
@@ -108,7 +106,9 @@ namespace BackEndPortfolioSite.Controllers
             return Ok(new
             {
                 user.Email,
-                user.DisplayName
+                user.DisplayName,
+                user.Role,
+                user.IsActive
             });
         }
         #endregion

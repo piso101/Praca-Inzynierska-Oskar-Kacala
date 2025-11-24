@@ -17,7 +17,7 @@ namespace BackEnd.Infrastructure.Services.Auth
 
         public string GenerateToken(UserAccount user)
         {
-            var jwtKey = _config["Jwt:Key"];
+            var jwtKey = _config["Jwt:Key"] ?? throw new InvalidOperationException("Jwt:Key is not configured");
             var jwtIssuer = _config["Jwt:Issuer"] ?? "app";
             var jwtAudience = _config["Jwt:Audience"] ?? "app";
 
@@ -43,9 +43,37 @@ namespace BackEnd.Infrastructure.Services.Auth
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
+        public string GenerateQuestToken(QuestAccount questAccount)
+        {
+            var jwtKey = _config["Jwt:Key"] ?? throw new InvalidOperationException("Jwt:Key is not configured");
+            var jwtIssuer = _config["Jwt:Issuer"] ?? "app";
+            var jwtAudience = _config["Jwt:Audience"] ?? "app";
+
+            var claims = new List<Claim>
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, questAccount.Id.ToString()),
+                new Claim(ClaimTypes.Name, questAccount.DisplayName ?? questAccount.Email ?? "quest"),
+                new Claim(ClaimTypes.Role, questAccount.Role.ToString()),
+                new Claim(JwtRegisteredClaimNames.Email, questAccount.Email ?? string.Empty)
+            };
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            var token = new JwtSecurityToken(
+                issuer: jwtIssuer,
+                audience: jwtAudience,
+                claims: claims,
+                expires: DateTime.UtcNow.AddHours(12),
+                signingCredentials: creds
+            );
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
         public ClaimsPrincipal? ValidateToken(string token)
         {
-            var jwtKey = _config["Jwt:Key"];
+            var jwtKey = _config["Jwt:Key"] ?? throw new InvalidOperationException("Jwt:Key is not configured");
             var jwtIssuer = _config["Jwt:Issuer"] ?? "app";
             var jwtAudience = _config["Jwt:Audience"] ?? "app";
 
@@ -60,7 +88,7 @@ namespace BackEnd.Infrastructure.Services.Auth
                 ValidIssuer = jwtIssuer,
                 ValidAudience = jwtAudience,
                 IssuerSigningKey = key,
-                ValidateLifetime = true, // sprawdza czy token nie wygas³
+                ValidateLifetime = true, // sprawdza czy token nie wygasï¿½
                 ClockSkew = TimeSpan.Zero // brak "okna tolerancji" czasu
             };
 
@@ -71,8 +99,12 @@ namespace BackEnd.Infrastructure.Services.Auth
             }
             catch (Exception)
             {
-                return null; // token niepoprawny lub wygas³
+                return null; // token niepoprawny lub wygasï¿½
             }
         }
     }
 }
+
+
+
+

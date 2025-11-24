@@ -11,6 +11,19 @@ CREATE TABLE IF NOT EXISTS user_account (
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+-- Tabela użytkowników ankiet (Quest) - logowanie przez email
+CREATE TABLE IF NOT EXISTS quest_account (
+    id BIGSERIAL PRIMARY KEY,
+    email TEXT NOT NULL UNIQUE,
+    display_name TEXT,
+    role INTEGER NOT NULL DEFAULT 2,  -- Quest role = 2
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    email_verification_token TEXT,
+    token_expires_at TIMESTAMPTZ,
+    email_verified_at TIMESTAMPTZ
+);
+
 
 -- Tabela ankiet
 CREATE TABLE IF NOT EXISTS survey (
@@ -51,7 +64,7 @@ CREATE TABLE IF NOT EXISTS question_element (
 CREATE TABLE IF NOT EXISTS survey_response (
     id BIGSERIAL PRIMARY KEY,
     survey_id BIGINT NOT NULL REFERENCES survey(id) ON DELETE CASCADE,
-    user_id BIGINT REFERENCES user_account(id) ON DELETE SET NULL,
+    user_id BIGINT,  -- może być z user_account lub quest_account
     submitted_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     metadata JSONB
 );
@@ -77,5 +90,12 @@ CREATE INDEX IF NOT EXISTS idx_survey_response_user ON survey_response (user_id)
 CREATE INDEX IF NOT EXISTS idx_response_answer_response ON response_answer (response_id);
 CREATE INDEX IF NOT EXISTS idx_response_answer_question ON response_answer (question_id);
 CREATE INDEX IF NOT EXISTS idx_response_answer_selected_element ON response_answer (selected_element_id);
+CREATE INDEX IF NOT EXISTS idx_quest_account_email ON quest_account (email);
+CREATE INDEX IF NOT EXISTS idx_quest_account_verification_token ON quest_account (email_verification_token);
+
+-- Komentarze
+COMMENT ON TABLE quest_account IS 'Użytkownicy ankiet logujący się przez email';
+COMMENT ON COLUMN quest_account.role IS 'Rola użytkownika: 0=Anonymous, 1=Admin, 2=Quest';
+COMMENT ON COLUMN quest_account.email_verification_token IS 'Token weryfikacyjny wysyłany w emailu (ważny 1h)';
 
 COMMIT;

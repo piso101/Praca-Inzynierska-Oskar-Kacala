@@ -1,0 +1,54 @@
+.root {
+  min-height: 100vh;
+  padding-top: calc(var(--nav-height) + 40px);
+}
+
+.container {
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding: 0 24px 48px;
+}
+
+.title {
+  font-size: clamp(20px, 3.5vw, 44px);
+  font-weight: 300;
+  letter-spacing: 0.6px;
+  margin: 0 0 16px 0;
+}
+
+.sandboxWrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(255,255,255,0.06);
+  border: 2px solid #fff;
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.sandboxInner {
+  width: 960px;
+  max-width: 100%;
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+.btn {
+  background: #000;
+  color: #fff;
+  border: 2px solid rgba(255,255,255,0.9);
+  padding: 10px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+
+
+
+
+

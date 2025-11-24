@@ -1,0 +1,90 @@
+.root {
+  min-height: 100vh;
+  padding-top: calc(var(--nav-height) + 40px);
+}
+
+.container {
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding: 0 24px 48px;
+}
+
+.title {
+  font-size: clamp(20px, 3.5vw, 44px);
+  font-weight: 300;
+  letter-spacing: 0.6px;
+  margin: 0 0 20px 0;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 12px;
+}
+
+.saveBar {
+  display: flex;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+.list {
+  display: grid;
+  gap: 12px;
+}
+
+.item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  align-items: center;
+  background: rgba(255,255,255,0.08);
+  border: 2px solid rgba(255,255,255,0.2);
+  border-radius: 12px;
+  padding: 12px 14px;
+}
+
+.dragArea {
+  display: grid;
+  grid-template-columns: 56px 1fr;
+  gap: 12px;
+  align-items: center;
+  cursor: grab;
+}
+
+.handle {
+  width: 48px;
+  height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed rgba(255,255,255,0.35);
+  border-radius: 8px;
+  cursor: grab;
+}
+
+.text {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.btn {
+  background: #000;
+  color: #fff;
+  border: 2px solid rgba(255,255,255,0.9);
+  padding: 8px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.btnGroup {
+  display: flex;
+  gap: 8px;
+}
+
+.empty {
+  color: var(--text-dim);
+}
+
+

@@ -1,3 +1,5 @@
+version: "3.8"
+
 services:
   backend:
     build:
@@ -7,11 +9,16 @@ services:
       - "8080:8080"
     depends_on:
       - db
+      - minio
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
 # Local credentials removed; configure these outside Git.
 # Local credentials removed; configure these outside Git.
-    # Opcjonalnie zamontuj kod dla hot-reload (dotnet watch)
+      # Dane do połączenia z MinIO (możesz wykorzystać w .NET np. w IStorageService)
+      - MINIO_ENDPOINT=http://minio:9000
+# Local credentials removed; configure these outside Git.
+# Local credentials removed; configure these outside Git.
+      - MINIO_BUCKET=my-bucket
     # volumes:
     #   - ./BackEnd:/src
 
@@ -28,6 +35,7 @@ services:
     volumes:
       - ./FrontEnd:/app
       - /app/node_modules
+    command: sh -c "npm ci && npm run dev -- --host 0.0.0.0 --port 5173 --strictPort"
     depends_on:
       - backend
 
@@ -42,3 +50,17 @@ services:
       - "5432:5432"
     volumes:
       - ./db:/docker-entrypoint-initdb.d
+
+  minio:
+    image: minio/minio:latest
+    container_name: minio
+    restart: unless-stopped
+    environment:
+# Local credentials removed; configure these outside Git.
+# Local credentials removed; configure these outside Git.
+    ports:
+      - "9000:9000" # API endpoint (S3)
+      - "9001:9001" # Web UI
+    volumes:
+      - ./data/minio:/data
+    command: server /data --console-address ":9001"

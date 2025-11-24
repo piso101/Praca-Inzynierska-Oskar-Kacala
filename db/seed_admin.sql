@@ -1,0 +1,2 @@
+-- No administrator is seeded with a shared default password.
+-- Configure credentials outside the repository.

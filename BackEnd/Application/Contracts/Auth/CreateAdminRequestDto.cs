@@ -8,3 +8,7 @@ namespace BackEnd.Application.Contracts.Auth
         public string? DisplayName { get; set; }
     }
 }
+
+
+
+

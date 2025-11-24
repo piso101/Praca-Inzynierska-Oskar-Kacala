@@ -13,6 +13,7 @@ namespace BackEndPortfolioSite
             #region Services Registration
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddInviteCodeHasher();
             builder.Services.AddSwaggerWithJwt();
             builder.Services.AddCustomDbContext(builder.Configuration);
             builder.Services.AddCustomRepositories();
@@ -20,6 +21,7 @@ namespace BackEndPortfolioSite
             builder.Services.AddCustomCors();
             builder.Services.AddAutoMapper(typeof(AuthMappingProfile).Assembly);
             builder.Services.AddScoped<JwtTokenService>();
+            builder.Services.AddEmailService();
             #endregion 
 
             var app = builder.Build();

@@ -1,0 +1,65 @@
+.root {
+  min-height: 100vh;
+  padding-top: calc(var(--nav-height) + 40px);
+}
+
+.container {
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding: 0 24px 48px;
+}
+
+.title {
+  font-size: clamp(20px, 3.5vw, 44px);
+  font-weight: 300;
+  letter-spacing: 0.6px;
+  margin: 0 0 28px 0;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px 40px;
+}
+
+.field { display: grid; gap: 10px; }
+.label { font-size: 16px; color: var(--text-dim); }
+.input, .textarea, .date, .checkbox {
+  background: transparent;
+  color: var(--text-color);
+  border: 2px solid rgba(255,255,255,0.7);
+  border-radius: 10px;
+  padding: 14px 16px;
+  font-size: 16px;
+  outline: none;
+}
+.input:focus, .textarea:focus, .date:focus { border-color: #fff; }
+.textarea { min-height: 52px; resize: vertical; }
+.checkboxRow { display: flex; align-items: center; gap: 12px; }
+
+.actions {
+  display: flex;
+  gap: 18px;
+  justify-content: center;
+  margin-top: 36px;
+  flex-wrap: wrap;
+}
+.btn {
+  background: #000;
+  color: #fff;
+  border: 2px solid rgba(255,255,255,0.9);
+  padding: 14px 24px;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.danger { border-color: #ffb3b3; }
+.btn:disabled { opacity: .6; cursor: default; }
+
+@media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+
+
+
+
+
+
