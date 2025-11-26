@@ -13,7 +13,11 @@ namespace BackEnd.Infrastructure.Persistence.EntityConfigurations
             builder.Property(x => x.Id).HasColumnName("id");
             builder.Property(x => x.SurveyId).HasColumnName("survey_id");
             builder.Property(x => x.UserId).HasColumnName("user_id");
+            builder.Property(x => x.QuestAccountId).HasColumnName("quest_account_id");
             builder.Property(x => x.SubmittedAt).HasColumnName("submitted_at");
+            
+            // Ignore navigation property - answers are stored in response_answer table
+            builder.Ignore(x => x.Answers);
         }
     }
 }

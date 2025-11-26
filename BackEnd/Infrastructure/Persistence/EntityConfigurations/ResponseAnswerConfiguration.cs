@@ -13,6 +13,8 @@ namespace BackEnd.Infrastructure.Persistence.EntityConfigurations
 
             builder.Property(x => x.Id).HasColumnName("id");
             builder.Property(x => x.ResponseId).HasColumnName("response_id");
+            builder.Property(x => x.QuestionId).HasColumnName("question_id");
+            builder.Property(x => x.SelectedElementId).HasColumnName("selected_element_id");
         }
     }
 }

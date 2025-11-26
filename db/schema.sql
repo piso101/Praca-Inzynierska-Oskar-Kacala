@@ -64,9 +64,14 @@ CREATE TABLE IF NOT EXISTS question_element (
 CREATE TABLE IF NOT EXISTS survey_response (
     id BIGSERIAL PRIMARY KEY,
     survey_id BIGINT NOT NULL REFERENCES survey(id) ON DELETE CASCADE,
-    user_id BIGINT,  -- może być z user_account lub quest_account
+    user_id BIGINT REFERENCES user_account(id) ON DELETE SET NULL,  -- Admin user (nullable)
+    quest_account_id BIGINT REFERENCES quest_account(id) ON DELETE SET NULL,  -- Quest account (nullable)
     submitted_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    metadata JSONB
+    metadata JSONB,
+    CONSTRAINT chk_one_user_type CHECK (
+        (user_id IS NOT NULL AND quest_account_id IS NULL) OR
+        (user_id IS NULL AND quest_account_id IS NOT NULL)
+    )
 );
 
 -- Wybrane elementy w odpowiedzi

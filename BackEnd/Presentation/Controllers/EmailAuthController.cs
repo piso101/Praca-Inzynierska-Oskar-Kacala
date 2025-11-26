@@ -39,7 +39,8 @@ namespace BackEndPortfolioSite.Controllers
         [AllowAnonymous]
         public async Task<ActionResult<SendEmailLoginResponseDto>> SendLoginEmail(
             [FromBody] SendEmailLoginRequestDto request,
-            [FromServices] IRepository<Survey> surveyRepo)
+            [FromServices] IRepository<Survey> surveyRepo,
+            [FromServices] IRepository<SurveyResponse> responseRepo)
         {
             if (string.IsNullOrWhiteSpace(request.Email))
             {
@@ -52,6 +53,23 @@ namespace BackEndPortfolioSite.Controllers
 
             // Check if account exists, if not create it
             var questAccount = await _questAccountRepo.GetByEmailAsync(request.Email);
+            
+            // Check if this email has already responded to this survey
+            if (request.SurveyId.HasValue && questAccount != null)
+            {
+                var existingResponses = await responseRepo.ListAsync(r => 
+                    r.SurveyId == request.SurveyId.Value && 
+                    r.QuestAccountId == questAccount.Id);
+                
+                if (existingResponses.Any())
+                {
+                    return BadRequest(new SendEmailLoginResponseDto 
+                    { 
+                        Success = false, 
+                        Message = "Już odpowiedziałeś na tę ankietę. Każdy użytkownik może odpowiedzieć tylko raz." 
+                    });
+                }
+            }
             
             // Generate verification token (similar to previous project)
             var token = Guid.NewGuid().ToString();

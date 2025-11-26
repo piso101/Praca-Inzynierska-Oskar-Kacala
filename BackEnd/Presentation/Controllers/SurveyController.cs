@@ -241,6 +241,10 @@ namespace BackEndPortfolioSite.Controllers
                     Message = "Cannot get user ID from token" 
                 });
             }
+            
+            // Check if user is Quest or Admin
+            var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
+            bool isQuest = userRole == "Quest";
             #endregion
 
             #region Validations
@@ -271,13 +275,39 @@ namespace BackEndPortfolioSite.Controllers
                     Message = "No answers provided" 
                 });
             }
+            
+            // Check if this user has already responded to this survey
+            IReadOnlyList<SurveyResponse> existingResponses;
+            
+            if (isQuest)
+            {
+                existingResponses = await responseRepo.ListAsync(r => 
+                    r.SurveyId == request.SurveyId && 
+                    r.QuestAccountId == userId);
+            }
+            else
+            {
+                existingResponses = await responseRepo.ListAsync(r => 
+                    r.SurveyId == request.SurveyId && 
+                    r.UserId == userId);
+            }
+            
+            if (existingResponses.Any())
+            {
+                return BadRequest(new SubmitSurveyResponseResultDto 
+                { 
+                    Success = false, 
+                    Message = "Już odpowiedziałeś na tę ankietę. Każdy użytkownik może odpowiedzieć tylko raz." 
+                });
+            }
             #endregion
 
             #region Create Survey Response
             var surveyResponse = new SurveyResponse
             {
                 SurveyId = request.SurveyId,
-                UserId = userId,
+                UserId = isQuest ? null : userId,
+                QuestAccountId = isQuest ? userId : null,
                 SubmittedAt = DateTime.UtcNow
             };
 

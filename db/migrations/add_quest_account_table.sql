@@ -26,3 +26,4 @@ COMMENT ON COLUMN quest_account.role IS 'User role: 0=Anonymous, 1=Admin, 2=Ques
 
 COMMIT;
 
+

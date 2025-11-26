@@ -4,8 +4,9 @@ namespace BackEnd.Domain.Entities
     {
         public long Id { get; set; }
         public long SurveyId { get; set; }
-        public long UserId { get; set; }
+        public long? UserId { get; set; }  // Admin user (nullable)
+        public long? QuestAccountId { get; set; }  // Quest account (nullable)
         public DateTime SubmittedAt { get; set; }
-        public ResponseAnswer Answers { get; set; } = new ResponseAnswer();
+        public ICollection<ResponseAnswer> Answers { get; set; } = new List<ResponseAnswer>();
     }
 }
