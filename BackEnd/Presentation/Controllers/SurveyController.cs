@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using Microsoft.Extensions.Configuration;
 
 namespace BackEndPortfolioSite.Controllers
 {
@@ -14,10 +15,12 @@ namespace BackEndPortfolioSite.Controllers
     public class SurveyController : ControllerBase
     {
         private readonly IInviteCodeService _inviteCodeService;
+        private readonly IConfiguration _configuration;
 
-        public SurveyController(IInviteCodeService inviteCodeService)
+        public SurveyController(IInviteCodeService inviteCodeService, IConfiguration configuration)
         {
             _inviteCodeService = inviteCodeService;
+            _configuration = configuration;
         }
         #region Create Survey Endpoint
         [HttpPost("create-survey")]
@@ -335,6 +338,112 @@ namespace BackEndPortfolioSite.Controllers
                 Message = "Survey response submitted successfully",
                 ResponseId = surveyResponse.Id
             });
+        }
+        #endregion
+
+        #region Get Survey Results Endpoint
+        [HttpGet("survey-results")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<SurveyResultsDTO>> GetSurveyResults(
+            [FromQuery] long surveyId,
+            [FromServices] IRepository<Survey> surveyRepo,
+            [FromServices] IRepository<SurveyQuestion> questionRepo,
+            [FromServices] IRepository<QuestionElement> elementRepo,
+            [FromServices] IRepository<SurveyResponse> responseRepo,
+            [FromServices] IRepository<ResponseAnswer> answerRepo)
+        {
+            #region Load Survey
+            var survey = await surveyRepo.GetByIdAsync(surveyId);
+            if (survey == null)
+            {
+                return NotFound("Survey not found");
+            }
+            #endregion
+
+            #region Load Questions and Elements
+            var questions = (await questionRepo.ListAsync(q => q.SurveyId == surveyId))
+                .OrderBy(q => q.OrderIndex)
+                .ToList();
+
+            var questionIds = questions.Select(q => q.Id).ToList();
+            var allElements = (await elementRepo.ListAsync(e => questionIds.Contains(e.QuestionId)))
+                .ToList();
+            #endregion
+
+            #region Load Responses and Answers
+            var responses = await responseRepo.ListAsync(r => r.SurveyId == surveyId);
+            var responseIds = responses.Select(r => r.Id).ToList();
+            
+            var allAnswers = responseIds.Any() 
+                ? (await answerRepo.ListAsync(a => responseIds.Contains(a.ResponseId))).ToList()
+                : new List<ResponseAnswer>();
+            #endregion
+
+            #region Aggregate Results
+            var questionResults = new List<QuestionResultDTO>();
+
+            foreach (var question in questions)
+            {
+                var questionElements = allElements
+                    .Where(e => e.QuestionId == question.Id)
+                    .OrderBy(e => e.OrderIndex)
+                    .ToList();
+
+                var questionAnswers = allAnswers
+                    .Where(a => a.QuestionId == question.Id)
+                    .ToList();
+
+                var totalAnswers = questionAnswers.Count;
+
+                var elementResults = questionElements.Select(element =>
+                {
+                    var selectionCount = questionAnswers.Count(a => a.SelectedElementId == element.Id);
+                    var selectionPercentage = totalAnswers > 0 
+                        ? Math.Round((double)selectionCount / totalAnswers * 100, 2) 
+                        : 0;
+
+                    return new ElementResultDTO
+                    {
+                        ElementId = element.Id,
+                        X = (double)element.X,
+                        Y = (double)element.Y,
+                        Rotation = (double)element.Rotation,
+                        Scale = (double)element.Scale,
+                        SvgName = element.SvgName,
+                        SelectionCount = selectionCount,
+                        SelectionPercentage = selectionPercentage,
+                        OrderIndex = element.OrderIndex
+                    };
+                }).ToList();
+
+                questionResults.Add(new QuestionResultDTO
+                {
+                    QuestionId = question.Id,
+                    QuestionText = question.QuestionText,
+                    OrderIndex = question.OrderIndex,
+                    TotalAnswers = totalAnswers,
+                    Elements = elementResults
+                });
+            }
+            #endregion
+
+            #region Build Response DTO
+            var inviteCode = _inviteCodeService.GenerateInviteCode(survey.Id);
+            var frontendUrl = _configuration["FrontendUrl"]?.TrimEnd('/') ?? "http://localhost:5173";
+
+            var resultsDto = new SurveyResultsDTO
+            {
+                SurveyId = survey.Id,
+                Title = survey.Title,
+                Description = survey.Description,
+                TotalResponses = responses.Count,
+                Questions = questionResults,
+                InviteCode = inviteCode,
+                ShareLink = $"{frontendUrl}/join/{inviteCode}"
+            };
+            #endregion
+
+            return Ok(resultsDto);
         }
         #endregion
     }
