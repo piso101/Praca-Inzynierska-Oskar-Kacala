@@ -1,6 +1,5 @@
 namespace BackEnd.Domain.DTO
 {
-    // Main DTO containing all survey results
     public class SurveyResultsDTO
     {
         public long SurveyId { get; set; }
@@ -12,7 +11,6 @@ namespace BackEnd.Domain.DTO
         public List<QuestionResultDTO> Questions { get; set; } = new();
     }
 
-    // Results for a single question
     public class QuestionResultDTO
     {
         public long QuestionId { get; set; }
@@ -22,7 +20,6 @@ namespace BackEnd.Domain.DTO
         public List<ElementResultDTO> Elements { get; set; } = new();
     }
 
-    // Results for a single element (answer option)
     public class ElementResultDTO
     {
         public long ElementId { get; set; }

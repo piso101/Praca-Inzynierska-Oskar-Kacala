@@ -14,13 +14,11 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
 # Local credentials removed; configure these outside Git.
 # Local credentials removed; configure these outside Git.
-      # Dane do połączenia z MinIO (możesz wykorzystać w .NET np. w IStorageService)
+      # Dane do połączenia z MinIO 
       - MINIO_ENDPOINT=http://minio:9000
 # Local credentials removed; configure these outside Git.
 # Local credentials removed; configure these outside Git.
       - MINIO_BUCKET=my-bucket
-    # volumes:
-    #   - ./BackEnd:/src
 
   frontend:
     build:

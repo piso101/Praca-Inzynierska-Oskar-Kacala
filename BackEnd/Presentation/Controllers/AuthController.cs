@@ -34,7 +34,6 @@ namespace BackEndPortfolioSite.Controllers
                 return Unauthorized(new LoginResponseDto { Success = false, Message = "Invalid credentials or not admin" });
             }
 
-            // Wersja uproszczona: hasz jest przechowywany w PasswordHash i porównywany z plain (do wymiany na PBKDF2/BCrypt)
             if (user.PasswordHash != request.Password)
             {
                 return Unauthorized(new LoginResponseDto { Success = false, Message = "Invalid credentials" });

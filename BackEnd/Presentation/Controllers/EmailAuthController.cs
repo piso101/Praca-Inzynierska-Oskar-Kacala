@@ -51,10 +51,8 @@ namespace BackEndPortfolioSite.Controllers
                 });
             }
 
-            // Check if account exists, if not create it
             var questAccount = await _questAccountRepo.GetByEmailAsync(request.Email);
             
-            // Check if this email has already responded to this survey
             if (request.SurveyId.HasValue && questAccount != null)
             {
                 var existingResponses = await responseRepo.ListAsync(r => 
@@ -71,16 +69,14 @@ namespace BackEndPortfolioSite.Controllers
                 }
             }
             
-            // Generate verification token (similar to previous project)
             var token = Guid.NewGuid().ToString();
             
             if (questAccount == null)
             {
-                // Create new account with token
                 questAccount = new QuestAccount
                 {
                     Email = request.Email,
-                    DisplayName = request.Email.Split('@')[0], // Use email prefix as display name
+                    DisplayName = request.Email.Split('@')[0],
                     Role = UserRole.Quest,
                     IsActive = true,
                     CreatedAt = DateTime.UtcNow,
@@ -92,14 +88,12 @@ namespace BackEndPortfolioSite.Controllers
             }
             else
             {
-                // Update existing account with new token
                 questAccount.EmailVerificationToken = token;
                 questAccount.TokenExpiresAt = DateTime.UtcNow.AddHours(1);
                 await _questAccountRepo.UpdateAsync(questAccount);
                 await _questAccountRepo.SaveChangesAsync();
             }
 
-            // Get survey information if surveyId provided
             string surveyTitle = "Ankieta";
             string surveyDescription = "Prosimy o wypełnienie ankiety.";
             
@@ -113,7 +107,6 @@ namespace BackEndPortfolioSite.Controllers
                 }
             }
 
-            // Send email with login link
             var frontendUrl = _configuration["FrontendUrl"] ?? "http://localhost:5173";
             var loginLink = $"{frontendUrl}/email-login?token={token}";
             
@@ -172,7 +165,6 @@ namespace BackEndPortfolioSite.Controllers
                 });
             }
 
-            // Mark email as verified
             questAccount.EmailVerifiedAt = DateTime.UtcNow;
             questAccount.EmailVerificationToken = null;
             questAccount.TokenExpiresAt = null;
@@ -180,7 +172,6 @@ namespace BackEndPortfolioSite.Controllers
             await _questAccountRepo.UpdateAsync(questAccount);
             await _questAccountRepo.SaveChangesAsync();
 
-            // Generate JWT token
             var jwtToken = _jwtService.GenerateQuestToken(questAccount);
 
             return Ok(new VerifyEmailLoginResponseDto 

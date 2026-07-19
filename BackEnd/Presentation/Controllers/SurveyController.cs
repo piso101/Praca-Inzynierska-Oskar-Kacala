@@ -245,7 +245,6 @@ namespace BackEndPortfolioSite.Controllers
                 });
             }
             
-            // Check if user is Quest or Admin
             var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
             bool isQuest = userRole == "Quest";
             #endregion
@@ -279,7 +278,6 @@ namespace BackEndPortfolioSite.Controllers
                 });
             }
             
-            // Check if this user has already responded to this survey
             IReadOnlyList<SurveyResponse> existingResponses;
             
             if (isQuest)

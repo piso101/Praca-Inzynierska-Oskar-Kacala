@@ -8,7 +8,7 @@ RUN if [ -f package-lock.json ]; then npm ci; \
     elif [ -f yarn.lock ]; then yarn install --frozen-lockfile; \
     else npm install; fi
 
-# Skopiuj resztę (w dev i tak podmienią to volume)
+# Kopia Reszty (w dev i tak podmienią to volume)
 COPY . .
 
 # Hot Reload w kontenerze (Windows/Mac + volume) – wymuś polling

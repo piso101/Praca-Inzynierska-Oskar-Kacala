@@ -25,7 +25,6 @@ public class InviteCodeService : IInviteCodeService
         using var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(key));
         var hash = hmac.ComputeHash(Encoding.UTF8.GetBytes(surveyId.ToString()));
 
-        // Skracamy do 8 znaków w Base64 dla prostego invite code
         var code = Convert.ToBase64String(hash)
             .Replace("+", "")
             .Replace("/", "")
@@ -41,11 +40,9 @@ public class InviteCodeService : IInviteCodeService
         var parts = inviteCode.Split('-');
         if (parts.Length != 2) return null;
 
-        // 1. Odczytujemy surveyId z pierwszej części (hex)
         if (!long.TryParse(parts[0], System.Globalization.NumberStyles.HexNumber, null, out long surveyId))
             return null;
 
-        // 2. Weryfikacja hash z kluczem
         var key = _hashKeyProvider.GetHashKey();
         using var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(key));
         var hash = hmac.ComputeHash(Encoding.UTF8.GetBytes(surveyId.ToString()));
@@ -56,9 +53,9 @@ public class InviteCodeService : IInviteCodeService
             .Substring(0, 8);
 
         if (parts[1] != expectedCode)
-            return null; // hash nie pasuje – invite code niepoprawny
+            return null;
 
-        return surveyId; // wszystko OK, zwracamy surveyId
+        return surveyId;
     }
 
     public bool ValidateInviteCode(long surveyId, string inviteCode)

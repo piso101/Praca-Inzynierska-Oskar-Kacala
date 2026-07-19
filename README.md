@@ -1,1 +1,0 @@
-# Praca-Inzynierska-Oskar-Kacala

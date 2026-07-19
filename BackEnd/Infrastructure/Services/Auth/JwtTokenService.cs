@@ -88,8 +88,8 @@ namespace BackEnd.Infrastructure.Services.Auth
                 ValidIssuer = jwtIssuer,
                 ValidAudience = jwtAudience,
                 IssuerSigningKey = key,
-                ValidateLifetime = true, // sprawdza czy token nie wygas�
-                ClockSkew = TimeSpan.Zero // brak "okna tolerancji" czasu
+                ValidateLifetime = true, 
+                ClockSkew = TimeSpan.Zero
             };
 
             try
@@ -99,7 +99,7 @@ namespace BackEnd.Infrastructure.Services.Auth
             }
             catch (Exception)
             {
-                return null; // token niepoprawny lub wygas�
+                return null;
             }
         }
     }
