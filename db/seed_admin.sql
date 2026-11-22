@@ -1,2 +1,3 @@
 -- No administrator is seeded with a shared default password.
--- Configure credentials outside the repository.
+-- Configure OwnerPassword outside the repository and create an administrator
+-- through POST /api/Auth/create-admin for local development.

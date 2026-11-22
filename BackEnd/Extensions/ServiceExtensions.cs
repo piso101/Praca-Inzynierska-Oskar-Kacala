@@ -1,4 +1,4 @@
-using BackEnd.Domain.Repositories;
+﻿using BackEnd.Domain.Repositories;
 using BackEnd.Domain.Shared;
 using BackEnd.Infrastructure.Persistence;
 using BackEnd.Infrastructure.Persistence.Repositories;
@@ -18,7 +18,8 @@ namespace BackEnd.Extensions
     {
         public static IServiceCollection AddCustomDbContext(this IServiceCollection services, IConfiguration config)
         {
-            var connString = config.GetConnectionString("DefaultConnection");
+            var connString = config.GetConnectionString("DefaultConnection")
+                ?? throw new InvalidOperationException("ConnectionStrings:DefaultConnection is not configured");
             var dataSourceBuilder = new NpgsqlDataSourceBuilder(connString);
             dataSourceBuilder.MapEnum<UserRole>("user_role", new NpgsqlSnakeCaseNameTranslator());
             var dataSource = dataSourceBuilder.Build();
@@ -51,6 +52,10 @@ namespace BackEnd.Extensions
         public static IServiceCollection AddJwtAuthentication(this IServiceCollection services, IConfiguration config)
         {
             var jwtKey = config["Jwt:Key"];
+            if (string.IsNullOrWhiteSpace(jwtKey) || Encoding.UTF8.GetByteCount(jwtKey) < 32)
+            {
+                throw new InvalidOperationException("Jwt:Key must be configured with at least 32 bytes");
+            }
             var jwtIssuer = config["Jwt:Issuer"] ?? "app";
             var jwtAudience = config["Jwt:Audience"] ?? "app";
 

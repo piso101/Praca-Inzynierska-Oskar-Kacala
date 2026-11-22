@@ -1,24 +1,33 @@
-version: "3.8"
-
 services:
   backend:
     build:
       context: ./BackEnd
     container_name: backend
     ports:
-      - "8080:8080"
+      - "127.0.0.1:8080:8080"
     depends_on:
-      - db
-      - minio
+      db:
+        condition: service_healthy
+      minio:
+        condition: service_started
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-# Local credentials removed; configure these outside Git.
-# Local credentials removed; configure these outside Git.
-      # Dane do połączenia z MinIO 
-      - MINIO_ENDPOINT=http://minio:9000
-# Local credentials removed; configure these outside Git.
-# Local credentials removed; configure these outside Git.
-      - MINIO_BUCKET=my-bucket
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__DefaultConnection: "Host=db;Port=5432;Database=${POSTGRES_DB:-survey};Username=${POSTGRES_USER:?Set POSTGRES_USER in .env};Password=${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}"
+      Jwt__Key: "${JWT_KEY:?Set JWT_KEY in .env}"
+      HashingSystem__DefaultHashingSurveyKey: "${SURVEY_HASH_KEY:?Set SURVEY_HASH_KEY in .env}"
+      OwnerPassword: "${OWNER_PASSWORD:?Set OWNER_PASSWORD in .env}"
+      Google__ApiKey: "${GOOGLE_API_KEY:-}"
+      Google__ClientId: "${GOOGLE_CLIENT_ID:-}"
+      Google__ClientSecret: "${GOOGLE_CLIENT_SECRET:-}"
+      Gmail__FromEmail: "${GMAIL_FROM_EMAIL:-}"
+      Gmail__AppPassword: "${GMAIL_APP_PASSWORD:-}"
+      Gmail__SmtpHost: "${GMAIL_SMTP_HOST:-smtp.gmail.com}"
+      Gmail__SmtpPort: "${GMAIL_SMTP_PORT:-587}"
+      FrontendUrl: "http://localhost:5173"
+      MINIO_ENDPOINT: "http://minio:9000"
+      MINIO_ROOT_USER: "${MINIO_ROOT_USER:?Set MINIO_ROOT_USER in .env}"
+      MINIO_ROOT_PASSWORD: "${MINIO_ROOT_PASSWORD:?Set MINIO_ROOT_PASSWORD in .env}"
+      MINIO_BUCKET: "my-bucket"
 
   frontend:
     build:
@@ -26,10 +35,14 @@ services:
       dockerfile: Dockerfile
     container_name: frontend
     ports:
-      - "5173:5173"
+      - "127.0.0.1:5173:5173"
     environment:
       NODE_ENV: development
       VITE_API_BASE_URL: /api
+      VITE_S3_ENDPOINT: "${VITE_S3_ENDPOINT:-http://localhost:9000}"
+      VITE_S3_ACCESS_KEY: "${MINIO_ROOT_USER:?Set MINIO_ROOT_USER in .env}"
+      VITE_S3_SECRET_KEY: "${MINIO_ROOT_PASSWORD:?Set MINIO_ROOT_PASSWORD in .env}"
+      VITE_S3_BUCKET: "my-bucket"
     volumes:
       - ./FrontEnd:/app
       - /app/node_modules
@@ -41,24 +54,29 @@ services:
     image: postgres:15
     container_name: postgres
     environment:
-      POSTGRES_USER: myuser
-# Local credentials removed; configure these outside Git.
-      POSTGRES_DB: mydatabase
+      POSTGRES_USER: "${POSTGRES_USER:?Set POSTGRES_USER in .env}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}"
+      POSTGRES_DB: "${POSTGRES_DB:-survey}"
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
     volumes:
       - ./db:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:?Set POSTGRES_USER in .env} -d ${POSTGRES_DB:-survey}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   minio:
-    image: minio/minio:latest
+    image: docker.io/pgsty/silo:RELEASE.2026-10-18T00-00-00Z
     container_name: minio
     restart: unless-stopped
     environment:
-# Local credentials removed; configure these outside Git.
-# Local credentials removed; configure these outside Git.
+      MINIO_ROOT_USER: "${MINIO_ROOT_USER:?Set MINIO_ROOT_USER in .env}"
+      MINIO_ROOT_PASSWORD: "${MINIO_ROOT_PASSWORD:?Set MINIO_ROOT_PASSWORD in .env}"
     ports:
-      - "9000:9000" # API endpoint (S3)
-      - "9001:9001" # Web UI
+      - "127.0.0.1:9000:9000"
+      - "127.0.0.1:9001:9001"
     volumes:
       - ./data/minio:/data
     command: server /data --console-address ":9001"

@@ -7,6 +7,10 @@ const S3_ACCESS_KEY = import.meta.env.VITE_S3_ACCESS_KEY;
 const S3_SECRET_KEY = import.meta.env.VITE_S3_SECRET_KEY;
 const S3_BUCKET = import.meta.env.VITE_S3_BUCKET || 'my-bucket';
 
+if (!S3_ACCESS_KEY || !S3_SECRET_KEY) {
+  throw new Error('Configure local-only VITE_S3_ACCESS_KEY and VITE_S3_SECRET_KEY values; frontend credentials are public.');
+}
+
 export const s3 = new S3Client({
   endpoint: S3_ENDPOINT,
   region: S3_REGION,

@@ -1,6 +1,8 @@
 **/.classpath
 **/.dockerignore
 **/.env
+**/.env.*
+**/appsettings.Development.json
 **/.git
 **/.gitignore
 **/.project
@@ -20,6 +22,12 @@
 **/npm-debug.log
 **/obj
 **/secrets.dev.yaml
+**/secrets/
+**/*.pem
+**/*.key
+**/*.p12
+**/*.pfx
+**/*.secret
 **/values.dev.yaml
 LICENSE
 README.md

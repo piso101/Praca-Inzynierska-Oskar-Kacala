@@ -16,6 +16,12 @@ public class HashKeyProvider : IHashKeyProvider
 
     public string GetHashKey()
     {
-        return _config["HashingSystem:DefaultHashingSurveyKey"]??"0";
+        var key = _config["HashingSystem:DefaultHashingSurveyKey"];
+        if (string.IsNullOrWhiteSpace(key) || System.Text.Encoding.UTF8.GetByteCount(key) < 32)
+        {
+            throw new InvalidOperationException("HashingSystem:DefaultHashingSurveyKey must be configured with at least 32 bytes");
+        }
+
+        return key;
     }
 }

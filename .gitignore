@@ -24,6 +24,21 @@ pnpm-debug.log*
 .env.*
 !.env.example
 
+# Local object-storage data and secret material
+data/
+*.db
+*.sqlite
+*.sqlite3
+*.dump
+*.backup
+*.bak
+*.pem
+*.key
+*.p12
+*.pfx
+*.secret
+secrets/
+
 # --- Node / Vite (Frontend) ---
 node_modules/
 **/node_modules/
